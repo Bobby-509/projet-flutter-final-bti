@@ -27,8 +27,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: _passwordController.text.trim(),
       );
 
-      // ❌ PAS DE NAVIGATION ICI
-      // ✅ AuthWrapper va automatiquement envoyer vers HomeScreen
 
     } on FirebaseAuthException catch (e) {
       String message;

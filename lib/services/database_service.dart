@@ -20,7 +20,7 @@ class DatabaseService {
     //await deleteDatabase(path);
     return await openDatabase(
       path,
-      version: 2, // ⚡ version 2 pour la migration
+      version: 2,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );

@@ -24,8 +24,8 @@ class Task {
       'description': description,
       'category': category,
       'isDone': isDone ? 1 : 0,
-      'createdAt': createdAt.toIso8601String(), // string ISO
-      'dueDate': dueDate?.toIso8601String(),     // ⚡ convertir en string
+      'createdAt': createdAt.toIso8601String(),
+      'dueDate': dueDate?.toIso8601String(),
     };
   }
 

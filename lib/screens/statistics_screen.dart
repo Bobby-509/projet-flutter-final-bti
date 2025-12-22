@@ -27,7 +27,7 @@ class StatisticsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // 📊 PIE CHART
+            // PIE CHART
             SizedBox(
               height: 200,
               child: PieChart(
@@ -62,7 +62,7 @@ class StatisticsScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // 🧾 Légende
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
@@ -80,7 +80,7 @@ class StatisticsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // 📊 BAR CHART
+
             SizedBox(
               height: 200,
               child: BarChart(
@@ -138,7 +138,7 @@ class StatisticsScreen extends StatelessWidget {
   }
 }
 
-// 🧩 Widget légende
+
 class Legend extends StatelessWidget {
   final Color color;
   final String text;

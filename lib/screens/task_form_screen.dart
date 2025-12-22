@@ -126,7 +126,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         await DatabaseService.instance.updateTask(task);
       }
 
-      Navigator.pop(context, true); // indique qu'il y a eu un changement
+      Navigator.pop(context, true);
 
     }
   }
