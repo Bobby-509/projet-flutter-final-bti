@@ -12,147 +12,116 @@ class StatisticsScreen extends StatelessWidget {
     final completed = tasks.where((t) => t.isDone).length;
     final pending = total - completed;
 
+    // Comptage par catégorie
+    final categories = ['Travail', 'Personnel', 'Urgent'];
+    final categoryCounts = categories.map((c) => tasks.where((t) => t.category == c).length).toList();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Statistiques')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: total == 0
-            ? const Center(child: Text('Aucune tâche disponible'))
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Répartition des tâches',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Tâches totales : $total', style: const TextStyle(fontSize: 16)),
+              Text('Tâches complétées : $completed', style: const TextStyle(fontSize: 16)),
+              Text('Tâches en cours : $pending', style: const TextStyle(fontSize: 16)),
+              const SizedBox(height: 20),
 
-            // PIE CHART
-            SizedBox(
-              height: 200,
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 40,
-                  sections: [
-                    PieChartSectionData(
-                      value: completed.toDouble(),
-                      title: '$completed',
-                      color: Colors.green,
-                      radius: 60,
-                      titleStyle: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+              // Pie Chart : complétées / en cours
+              SizedBox(
+                height: 200,
+                child: PieChart(
+                  PieChartData(
+                    sections: [
+                      PieChartSectionData(
+                        value: pending.toDouble(),
+                        color: Colors.red,
+                        title: '${((pending / total) * 100).toStringAsFixed(1)}%',
+                        radius: 60,
+                        titleStyle: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
-                    ),
-                    PieChartSectionData(
-                      value: pending.toDouble(),
-                      title: '$pending',
-                      color: Colors.orange,
-                      radius: 60,
-                      titleStyle: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      PieChartSectionData(
+                        value: completed.toDouble(),
+                        color: Colors.green,
+                        title: '${((completed / total) * 100).toStringAsFixed(1)}%',
+                        radius: 60,
+                        titleStyle: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Legend(color: Colors.green, text: 'Complétées'),
-                SizedBox(width: 16),
-                Legend(color: Colors.orange, text: 'En cours'),
-              ],
-            ),
-
-            const SizedBox(height: 32),
-
-            const Text(
-              'Comparaison',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-
-            SizedBox(
-              height: 200,
-              child: BarChart(
-                BarChartData(
-                  barGroups: [
-                    BarChartGroupData(
-                      x: 0,
-                      barRods: [
-                        BarChartRodData(
-                          toY: completed.toDouble(),
-                          color: Colors.green,
-                          width: 30,
-                        ),
-                      ],
-                    ),
-                    BarChartGroupData(
-                      x: 1,
-                      barRods: [
-                        BarChartRodData(
-                          toY: pending.toDouble(),
-                          color: Colors.orange,
-                          width: 30,
-                        ),
-                      ],
-                    ),
-                  ],
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: true),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, _) {
-                          switch (value.toInt()) {
-                            case 0:
-                              return const Text('Faites');
-                            case 1:
-                              return const Text('En cours');
-                            default:
-                              return const Text('');
-                          }
-                        },
-                      ),
-                    ),
+                    ],
+                    centerSpaceRadius: 40,
+                    sectionsSpace: 2,
+                    borderData: FlBorderData(show: false),
                   ),
-                  borderData: FlBorderData(show: false),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.circle, color: Colors.green, size: 16),
+                  SizedBox(width: 4),
+                  Text('Complétées'),
+                  SizedBox(width: 16),
+                  Icon(Icons.circle, color: Colors.red, size: 16),
+                  SizedBox(width: 4),
+                  Text('En cours'),
+                ],
+              ),
+              const SizedBox(height: 40),
+
+              const Text('Tâches par catégorie', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+
+              // Bar Chart par catégorie
+              SizedBox(
+                height: 200,
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: categoryCounts.reduce((a, b) => a > b ? a : b).toDouble() + 1,
+                    barTouchData: BarTouchData(enabled: false),
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: true),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            int index = value.toInt();
+                            if (index >= 0 && index < categories.length) {
+                              return Text(categories[index]);
+                            }
+                            return const Text('');
+                          },
+                        ),
+                      ),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    barGroups: List.generate(categories.length, (i) {
+                      return BarChartGroupData(
+                        x: i,
+                        barRods: [
+                          BarChartRodData(
+                            toY: categoryCounts[i].toDouble(),
+                            color: Colors.blue,
+                            width: 20,
+                          ),
+                        ],
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-
-class Legend extends StatelessWidget {
-  final Color color;
-  final String text;
-
-  const Legend({super.key, required this.color, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(width: 14, height: 14, color: color),
-        const SizedBox(width: 6),
-        Text(text),
-      ],
-    );
-  }
-}

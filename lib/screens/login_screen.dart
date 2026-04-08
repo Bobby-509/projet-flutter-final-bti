@@ -14,7 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
-
   void _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
@@ -32,11 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
           message = 'Utilisateur non trouvé.';
         } else if (e.code == 'wrong-password') {
           message = 'Mot de passe incorrect.';
+          print(message);
         } else {
           message = e.message ?? 'Erreur inconnue.';
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
+          SnackBar(content: Text("mot de passe incorrect" )),
         );
       } finally {
         setState(() => _isLoading = false);

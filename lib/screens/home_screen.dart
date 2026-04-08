@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadTasks();
   }
 
+
   Future<void> _loadTasks() async {
     final data = await DatabaseService.instance.getTasks();
     setState(() {
@@ -38,22 +39,32 @@ class _HomeScreenState extends State<HomeScreen> {
       _applyFilters();
     });
   }
-
   void _applyFilters() {
-    List<Task> filtered = allTasks.where((task) {
-      final matchesSearch =
-      task.title.toLowerCase().contains(searchQuery.toLowerCase());
-      final matchesCategory =
-          selectedCategory == 'Toutes' || task.category == selectedCategory;
-      return matchesSearch && matchesCategory;
-    }).toList();
-
-    _sortTasks(filtered);
-
     setState(() {
-      tasks = filtered;
+      tasks = allTasks.where((task) {
+        final matchesSearch = searchQuery.isEmpty || task.title.toLowerCase().contains(searchQuery.toLowerCase());
+        final matchesCategory = selectedCategory == 'Toutes' || task.category == selectedCategory;
+        return matchesSearch && matchesCategory;
+      }).toList();
     });
   }
+
+  //
+  // void _applyFilters() {
+  //   List<Task> filtered = allTasks.where((task) {
+  //     final matchesSearch =
+  //     task.title.toLowerCase().contains(searchQuery.toLowerCase());
+  //     final matchesCategory =
+  //         selectedCategory == 'Toutes' || task.category == selectedCategory;
+  //     return matchesSearch && matchesCategory;
+  //   }).toList();
+  //
+  //   _sortTasks(filtered);
+  //
+  //   setState(() {
+  //     tasks = filtered;
+  //   });
+  // }
 
   void _sortTasks(List<Task> list) {
     switch (currentSort) {
@@ -217,19 +228,6 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
 
-            // onSelected: (value) {
-            //   if (value == 'date') _changeSort(SortType.date);
-            //   if (value == 'statut') _changeSort(SortType.statut);
-            //   if (value == 'categorie') _changeSort(SortType.categorie);
-            //   if (value == 'stats') {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (_) => StatisticsScreen(tasks: allTasks),
-            //       ),
-            //     );
-            //   }
-            // },
             itemBuilder: (_) => [
               const PopupMenuItem(
                 value: 'date',
@@ -266,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: DropdownButton<String>(
               value: selectedCategory,
               isExpanded: true,
-              items: ['Toutes', 'Travail', 'Personnel', 'Urgent']
+               items: ['Toutes', 'Travail', 'Personnel', 'Urgent']
                   .map(
                     (c) => DropdownMenuItem(
                   value: c,
