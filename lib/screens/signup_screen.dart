@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -11,10 +10,12 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
@@ -27,27 +28,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: _passwordController.text.trim(),
       );
 
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Compte créé avec succès 🎉'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+      Navigator.pushReplacementNamed(context, '/home');
 
     } on FirebaseAuthException catch (e) {
       String message;
 
       switch (e.code) {
         case 'email-already-in-use':
-          message = 'Cet email est déjà utilisé.';
+          message = 'Cet email est déjà utilisé';
           break;
         case 'weak-password':
-          message = 'Le mot de passe est trop faible.';
+          message = 'Mot de passe trop faible (min 6 caractères)';
           break;
         case 'invalid-email':
-          message = 'Email invalide.';
+          message = 'Email invalide';
           break;
         default:
-          message = e.message ?? 'Erreur inconnue.';
+          message = 'Erreur lors de l’inscription';
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.red,
+          ),
+        );
+
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -55,70 +76,131 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  InputDecoration _input(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inscription')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+
+          // ✅ IMPORTANT: FORM AJOUTÉ (FIX VALIDATION)
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+
+                // TITLE
+                const Text(
+                  "Créer un compte",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Email requis';
-                  }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Email invalide';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Mot de passe',
-                  prefixIcon: Icon(Icons.lock),
+
+                const SizedBox(height: 30),
+
+                // EMAIL
+                TextFormField(
+                  controller: _emailController,
+                  decoration: _input('Email', Icons.email),
+                  keyboardType: TextInputType.emailAddress,
+
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email requis';
+                    }
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                        .hasMatch(value)) {
+                      return 'Email invalide';
+                    }
+                    return null;
+                  },
                 ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Mot de passe requis';
-                  }
-                  if (value.length < 6) {
-                    return 'Minimum 6 caractères';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                onPressed: _signUp,
-                child: const Text('S’inscrire'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LoginScreen(),
+
+                const SizedBox(height: 16),
+
+                // PASSWORD
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  decoration: _input('Mot de passe', Icons.lock)
+                      .copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
-                  );
-                },
-                child: const Text('J’ai déjà un compte ? Se connecter'),
-              ),
-            ],
+                  ),
+
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Mot de passe requis';
+                    }
+                    if (value.length < 6) {
+                      return 'Minimum 6 caractères';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // BUTTON
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _signUp,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('S’inscrire'),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // LOGIN LINK
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                        context, '/login');
+                  },
+                  child: const Text('J’ai déjà un compte'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
