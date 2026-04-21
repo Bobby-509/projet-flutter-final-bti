@@ -28,7 +28,7 @@ class StatisticsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: ListView(
           children: [
-            // 🔥 CARD STATS
+            //CARD STATS
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -47,7 +47,7 @@ class StatisticsScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // 🔥 PIE CHART
+            // PIE CHART
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -90,7 +90,7 @@ class StatisticsScreen extends StatelessWidget {
                             ),
                           ),
 
-                          // 🔥 Texte au centre
+                          // Texte ct
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -126,7 +126,7 @@ class StatisticsScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // 🔥 BAR CHART
+            // BAR CHART
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(

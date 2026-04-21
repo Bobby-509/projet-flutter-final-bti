@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Connexion réussie 🎉'),
+            content: Text('Connexion réussie '),
             backgroundColor: Colors.green,
           ),
         );

@@ -34,7 +34,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ..hideCurrentSnackBar()
         ..showSnackBar(
           const SnackBar(
-            content: Text('Compte créé avec succès 🎉'),
+            content: Text('Compte créé avec succès'),
             backgroundColor: Colors.green,
           ),
         );
@@ -100,7 +100,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
 
-          // ✅ IMPORTANT: FORM AJOUTÉ (FIX VALIDATION)
+          //FORM
           child: Form(
             key: _formKey,
             child: Column(

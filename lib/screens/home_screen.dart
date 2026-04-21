@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _applyFilters();
   }
 
-  // ── Sort Bottom Sheet ──────────────────────────────────────────────────────
+  // ── Sort Bottom Shee──────
 
   void _openSortSheet() {
     showModalBottomSheet(
@@ -140,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  // Titre général
+                  // Titre general
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: Text(
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Actions ───────────────────────────────────────────────────────────────
+  // ── Actions ──────────────────────────
 
   Future<void> _confirmDelete(Task task) async {
     final confirm = await showDialog<bool>(
@@ -263,19 +263,28 @@ class _HomeScreenState extends State<HomeScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => TaskFormScreen(),
+        // PASSAGE DU PARAMÈTRE : N'oublie pas de passer le 'task'
+        // pour que l'édition fonctionne aussi !
+        builder: (_) => TaskFormScreen(task: task),
       ),
     );
 
-// ✅ ICI tu récupères le message
+    // C'EST ICI QUE ÇA SE JOUE :
+    // Si le formulaire a renvoyé un succès, on recharge la base de données
     if (result != null && result["success"] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result["message"]),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      // 1. Recharger les données depuis SQLite
+      await _loadTasks();
+
+      // 2. Afficher le petit message de confirmation
+      if (mounted) { // Sécurité pour vérifier que l'écran est toujours là
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result["message"]),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -332,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.search),
             onPressed: _openSearch,
           ),
-          // Icône tri avec badge si tri actif (non-default)
+          // Icône tri avec badge si tri actif
           IconButton(
             icon: Badge(
               isLabelVisible: currentSort != SortType.dateDesc,
